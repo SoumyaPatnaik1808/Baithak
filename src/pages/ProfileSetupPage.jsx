@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, User, Camera, Check, AlertCircle, Sparkles, UploadCloud, CheckCircle2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ArrowLeft, User, Camera, Check, AlertCircle, ArrowRight } from 'lucide-react';
 import Button from '../components/ui/Button';
 
 // Predefined modern gradient avatars
@@ -12,18 +12,13 @@ const PRESET_AVATARS = [
   { id: 6, grad: "from-[#FF416C] to-[#FF4B2B]", symbol: "🔥", name: "Blaze" }
 ];
 
-const RegistrationPage = ({ onBack }) => {
-  // Form states
-  const [username, setUsername] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(PRESET_AVATARS[0]);
-  const [customAvatarUrl, setCustomAvatarUrl] = useState(null);
+const ProfileSetupPage = ({ onBack, profileData, setProfileData, onNext, isGoogleUser }) => {
+  const [username, setUsername] = useState(profileData.username || '');
+  const [displayName, setDisplayName] = useState(profileData.displayName || '');
+  const [selectedAvatar, setSelectedAvatar] = useState(profileData.selectedAvatar || PRESET_AVATARS[0]);
+  const [customAvatarUrl, setCustomAvatarUrl] = useState(profileData.customAvatarUrl || null);
   
-  // Validation and UI states
   const [usernameError, setUsernameError] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-
   const fileInputRef = useRef(null);
 
   // Validate Username rules
@@ -52,7 +47,7 @@ const RegistrationPage = ({ onBack }) => {
   };
 
   const handleUsernameChange = (e) => {
-    const val = e.target.value.toLowerCase().replace(/\s/g, ''); // Auto-lowercase and strip spaces for help
+    const val = e.target.value.toLowerCase().replace(/\s/g, '');
     setUsername(val);
     const errorMsg = validateUsername(val);
     setUsernameError(errorMsg);
@@ -63,11 +58,9 @@ const RegistrationPage = ({ onBack }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Create object URL for local preview
     const objectUrl = URL.createObjectURL(file);
     setCustomAvatarUrl(objectUrl);
     
-    // Create custom avatar object and set it as selected
     const customAvatar = {
       id: 99,
       grad: '',
@@ -85,93 +78,30 @@ const RegistrationPage = ({ onBack }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Final check
     const errorMsg = validateUsername(username);
-    if (errorMsg || !username || !displayName || !acceptedTerms) {
+    if (errorMsg || !username || !displayName) {
       if (errorMsg) setUsernameError(errorMsg);
       return;
     }
 
-    setIsSubmitted(true);
+    // Save states to parent
+    setProfileData({
+      username,
+      displayName,
+      selectedAvatar,
+      customAvatarUrl
+    });
+
+    onNext(); // Navigate to Confirmation screen
   };
 
-  // Check if form is fully valid to enable submit button
   const isFormValid = 
     username.trim() !== '' && 
     displayName.trim() !== '' && 
-    usernameError === '' && 
-    acceptedTerms;
+    usernameError === '';
 
-  // Render Success Screen
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-bg-dark text-on-surface font-body flex flex-col items-center justify-center p-6 select-none animate-fade-in">
-        <div className="max-w-md w-full bg-surface-dark border border-white/10 rounded-[32px] p-8 text-center space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.65)] hover:shadow-[0_25px_60px_rgba(255,186,9,0.15)] transition-all duration-500">
-          
-          {/* Animated Header Badge */}
-          <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-            
-            <div className="w-16 h-16 bg-green-400 text-white rounded-full flex items-center justify-center relative">
-              <CheckCircle2 size={36} className="stroke-[2.5]" />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h1 className="text-3xl font-heading font-bold text-on-surface tracking-tight">Profile Ready!</h1>
-            <p className="text-sm text-accent-yellow font-bold font-heading uppercase tracking-widest flex items-center justify-center gap-1.5">
-             Let's Baithak ! 
-            </p>
-          </div>
-
-          {/* Premium Profile ID Card View */}
-          <div className="relative border border-white/10 bg-bg-dark/60 rounded-2xl p-6 text-left space-y-4 overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-accent-yellow/5 rounded-full blur-2xl pointer-events-none"></div>
-            
-            <div className="flex items-center gap-4">
-              {selectedAvatar.custom ? (
-                <img 
-                  src={selectedAvatar.url} 
-                  alt="Avatar" 
-                  className="w-16 h-16 rounded-full object-cover border-2 border-accent-yellow shadow-md"
-                />
-              ) : (
-                <div className={`w-16 h-16 rounded-full bg-gradient-to-tr ${selectedAvatar.grad} flex items-center justify-center text-3xl shadow-md border-2 border-white/10`}>
-                  <span>{selectedAvatar.symbol}</span>
-                </div>
-              )}
-
-              <div className="space-y-0.5">
-                <p className="text-base font-bold text-on-surface">{displayName}</p>
-                <p className="text-xs text-accent-yellow/90 font-mono font-medium">{username}</p>
-                <p className="text-[10px] text-on-surface-variant/60 font-medium">Verified Campus Member</p>
-              </div>
-            </div>
-
-           
-          </div>
-        
-          <div className="flex items-center gap-2 text-sm text-on-surface-variant justify-center"> 
-
-<Button 
-            onClick={onBack}
-            variant="primary" 
-            className="w-full py-4 text-xs font-bold tracking-widest uppercase ]"
-          >
-          Next
-          </Button>
-       
-
-            
-          </div>
-          
-        </div>
-      </div>
-    );
-  }
-
-  // Render Form Screen (Solid Background)
   return (
-    <div className="min-h-screen bg-bg-dark text-on-surface font-body flex flex-col items-center justify-center py-12 px-6" >
+    <div className="min-h-screen bg-bg-dark text-on-surface font-body flex flex-col items-center justify-center py-12 px-6">
       
       {/* Back Button */}
       <button 
@@ -179,7 +109,7 @@ const RegistrationPage = ({ onBack }) => {
         className="fixed top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-xs font-semibold text-on-surface-variant hover:text-accent-yellow transition-colors cursor-pointer group z-50 bg-surface-dark/60 border border-white/10 px-4 py-2 rounded-full shadow-lg"
       >
         <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-        <span>Back to Home</span>
+        <span>{isGoogleUser ? 'Back to Home' : 'Back to Step 1'}</span>
       </button>
 
       {/* Main Glassmorphic Form Card */}
@@ -187,7 +117,13 @@ const RegistrationPage = ({ onBack }) => {
         <div className="p-8 md:p-10 space-y-8">
           
           {/* Header */}
-          <div className="space-y-2.5 text-left">
+          <div className="space-y-4 text-left">
+            {isGoogleUser && (
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[12px] font-bold text-on-surface select-none shadow-md">
+                <img src="/google-logo.png" alt="Google" className="h-[14px] w-auto object-contain shrink-0" />
+                <span>Google Account Linked</span>
+              </div>
+            )}
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-on-surface tracking-tight">
               Create Profile
             </h1>
@@ -326,32 +262,15 @@ const RegistrationPage = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Terms Checkbox */}
-            <div className="flex items-start gap-3 text-left pt-2">
-              <input
-                type="checkbox"
-                id="terms-checkbox"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1 w-4.5 h-4.5 rounded-lg border-white/10 bg-bg-dark text-accent-yellow focus:ring-accent-yellow/20 accent-accent-yellow cursor-pointer"
-                required
-              />
-              <label htmlFor="terms-checkbox" className="text-xs text-on-surface-variant/80 select-none cursor-pointer leading-relaxed">
-                By ticking this, I confirm that the details are correct and I agree to the{' '}
-                <a href="#/privacy" target="_blank" rel="noopener noreferrer" className="text-accent-yellow hover:underline font-semibold transition-all">Privacy Policy</a>
-                {' '}and{' '}
-                <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-accent-yellow hover:underline font-semibold transition-all">Terms</a> of Baithak.
-              </label>
-            </div>
-
-            {/* Submit Button */}
+            {/* Next / Proceed Button */}
             <Button
               type="submit"
               variant="primary"
               disabled={!isFormValid}
-              className="w-full py-4 text-xs font-bold tracking-widest uppercase hover:shadow-[0_0_35px_rgba(255,186,9,0.3)] transition-all"
+              className="w-full py-4 text-xs font-bold tracking-widest uppercase hover:shadow-[0_0_35px_rgba(255,186,9,0.3)] transition-all flex items-center justify-center gap-2 group"
             >
-              Proceed to Dashboard
+              <span>Next Step</span>
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </Button>
 
           </form>
@@ -363,4 +282,4 @@ const RegistrationPage = ({ onBack }) => {
   );
 };
 
-export default RegistrationPage;
+export default ProfileSetupPage;

@@ -6,7 +6,7 @@ import Button from '../components/ui/Button';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const LandingPage = ({ onGoogleSignUp }) => {
+const LandingPage = ({ onGoogleSignUp, onAboutClick, onTermsClick, onPrivacyClick }) => {
   const howItWorksRef = useRef(null);
   const activePathRef = useRef(null);
   const walkerRef = useRef(null);
@@ -217,6 +217,13 @@ const LandingPage = ({ onGoogleSignUp }) => {
           >
             How It Works
           </a>
+
+          <button
+            onClick={onAboutClick}
+            className="text-sm font-semibold px-4 py-1.5 rounded-full border border-transparent text-on-surface-variant hover:text-on-surface hover:border-accent-yellow/30 hover:bg-accent-yellow/5 transition-all duration-300 cursor-pointer bg-transparent"
+          >
+            About Us
+          </button>
         </div>
         <div className="flex gap-3">
           <Button onClick={() => document.getElementById('join-section')?.scrollIntoView({ behavior: 'smooth' })} variant="primary" className="text-xs py-2 px-5 font-bold cursor-pointer">
@@ -266,18 +273,6 @@ const LandingPage = ({ onGoogleSignUp }) => {
             
             <nav className="flex flex-col space-y-4">
               <a 
-                href="#how-it-works" 
-                onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-semibold px-4 py-2 rounded-full border transition-all duration-300 ${
-                  activeSection === 'how-it-works'
-                    ? 'border-accent-yellow text-accent-yellow bg-accent-yellow/5'
-                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                How It Works
-              </a>
-             
-              <a 
                 href="#problems" 
                 onClick={() => setMobileMenuOpen(false)}
                 className={`text-sm font-semibold px-4 py-2 rounded-full border transition-all duration-300 ${
@@ -288,7 +283,28 @@ const LandingPage = ({ onGoogleSignUp }) => {
               >
                 Why Baithak
               </a>
-            
+             
+              <a 
+                href="#how-it-works" 
+                onClick={() => setMobileMenuOpen(false)}
+                className={`text-sm font-semibold px-4 py-2 rounded-full border transition-all duration-300 ${
+                  activeSection === 'how-it-works'
+                    ? 'border-accent-yellow text-accent-yellow bg-accent-yellow/5'
+                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                How It Works
+              </a>
+
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onAboutClick();
+                }}
+                className="text-sm font-semibold px-4 py-2 rounded-full border border-transparent text-on-surface-variant hover:text-on-surface hover:border-accent-yellow/30 hover:bg-accent-yellow/5 transition-all duration-300 cursor-pointer bg-transparent text-left"
+              >
+                About Us
+              </button>
             </nav>
           </div>
           
@@ -354,9 +370,10 @@ const LandingPage = ({ onGoogleSignUp }) => {
             </p>
  
           
-
+ 
           
            
+ 
 
           </div>
 
@@ -385,18 +402,16 @@ const LandingPage = ({ onGoogleSignUp }) => {
               {/* Terms of Service text */}
               <p className="text-[11px] text-on-surface-variant/60 leading-relaxed text-left">
                 By signing up, you agree to the{' '}
-                <a href="#" className="text-on-surface hover:text-accent-yellow underline transition-colors">
+                <a onClick={onTermsClick} className="text-on-surface hover:text-accent-yellow underline transition-colors">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-on-surface hover:text-accent-yellow underline transition-colors">
+                <a onClick={onPrivacyClick} className="text-on-surface hover:text-accent-yellow underline transition-colors">
                   Privacy Policy
                 </a>
                 , including{' '}
-                <a href="#" className="text-on-surface hover:text-accent-yellow underline transition-colors">
-                  Cookie Use
-                </a>
-                . Requires verified college email.
+               
+                . Requires verified college id.
               </p>
 
               {/* Already have an account? */}
@@ -609,11 +624,15 @@ const LandingPage = ({ onGoogleSignUp }) => {
           <div className="m-[1px] w-auto h-30">
             <img src="logo.png" alt="" className="w-auto h-40" />
           </div>
-          <div className="flex flex-wrap gap-8 text-[11px] font-bold text-on-surface-variant/50">
-            <a href="#" className="hover:text-accent-yellow transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-accent-yellow transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-accent-yellow transition-colors">Twitter / X</a>
-            <a href="#" className="hover:text-accent-yellow transition-colors">Discord Hub</a>
+          <div className="flex flex-wrap gap-8 text-[11px] font-bold text-on-surface-variant/50 items-center justify-center">
+            <button onClick={onAboutClick} className="hover:text-accent-yellow transition-colors cursor-pointer font-bold bg-transparent border-0">About Us</button>
+            <button onClick={onPrivacyClick} className="hover:text-accent-yellow transition-colors cursor-pointer font-bold bg-transparent border-0">Privacy Policy</button>
+            <button onClick={onTermsClick}  className="hover:text-accent-yellow transition-colors cursor-pointer font-bold bg-transparent border-0">Terms of Service</button>
+            
+            <a href="https://www.instagram.com/baithak.ig/" className="hover:text-accent-yellow transition-colors"> Instagram</a>
+            <a href="#" className="hover:text-accent-yellow transition-colors"> Twitter / X</a>
+            <a href="#" className="hover:text-accent-yellow transition-colors"> Linkedin</a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=baithak.support@gmail.com" target="_blank" className="hover:text-accent-yellow transition-colors">Support</a>
           </div>
           <p className="text-[10px] text-on-surface-variant/40">© 2026 Baithak. Designed for midnight academic communities.</p>
         </div>
